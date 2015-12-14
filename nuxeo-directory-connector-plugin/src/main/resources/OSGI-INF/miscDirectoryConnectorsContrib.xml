@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.directory.connector.jsontesting">
+
+  <extension point="schema" target="org.nuxeo.ecm.core.schema.TypeService">
+    <schema name="vocabulary" src="schemas/vocabulary.xsd"/>
+  </extension>
+  <extension
+    target="org.nuxeo.directory.connector.ConnectorBasedDirectoryFactory"
+    point="directories">
+    
+    <!-- The "demoNuxeoComDocumentsDynamic" directory
+  		 Connects to demo.nuxeo.com and gets documents whose title contains the value
+  		 entered by the user (query is done every time the user changes this value in
+  		 the suggestion box).
+  		 
+  		 Here, we must handle the vocavulary's id field and map it to the Nuxeo
+  		 Document's UUID. We are doing a REST request fetching a list of documents,
+  		 the JSON result is:
+  		 	{
+				"entity-type": "documents",
+				. . .
+				entries: [ {
+					  "entity-type": "document"
+					  "repository": "default"
+					  "uid": "2e668ca7-c7af-4489-9de3-045118688649"
+					  . . .
+					},
+					. . .
+				],
+				. . .
+			}
+  		 
+  		 The NuxeoDemoComDynamicConnector class extracts the "entries" field.
+  		 
+  		 Because we are using the "vocabulary" schema, we must do the following:
+  		 	* Set the idField tag to the "uid" JSON field:
+  		 			<idField>uid</idField>
+  		 	* Map the "id" vocabulary field to the "uid" JSON field, and the
+  		 	  "label" vocabulary field to the "title" JSON field:
+  		 			<mapping>
+  		 				<map field="id">uid</map>
+  		 				<map field="id">uid</map>
+  		 			</mapping>
+ 	-->
+    <directory name="demoNuxeoComDocumentsDynamic"
+      class="org.nuxeo.directory.connector.json.nuxeodemo.NuxeoDemoComDynamicConnector">
+      <idField>uid</idField>
+      <schema>vocabulary</schema>
+      <parameters>
+        <parameter name="url">http://demo.nuxeo.com/nuxeo/api/v1/</parameter>
+      </parameters>
+      <mapping>
+       <map field="label">title</map>
+       <map field="id">uid</map>
+      </mapping>
+    </directory>
+    
+    <!-- The "demoNuxeoComDocuments" directory
+  		 Connects to demo.nuxeo.com and gets documents whose fulltext contains 'nuxeo'.
+  		 As the connector used is the "inMemory" connector, the request is done once for all.
+  		 
+  		 Here, we must handle the vocavulary's id field and map it to the Nuxeo
+  		 Document's UUID. We are doing a REST request fetching a list of documents,
+  		 the JSON result is:
+  		 	{
+				"entity-type": "documents",
+				. . .
+				entries: [ {
+					  "entity-type": "document"
+					  "repository": "default"
+					  "uid": "2e668ca7-c7af-4489-9de3-045118688649"
+					  . . .
+					},
+					. . .
+				],
+				. . .
+			}
+  		 
+  		 The NuxeoDemoComInMemoryConnector class extracts the "entries" field (see extractResult())
+  		 
+  		 Because we are using the "vocabulary" schema, we must do the following:
+  		 	* Set the idField tag to the "uid" JSON field:
+  		 			<idField>uid</idField>
+  		 	* Map the "id" vocabulary field to the "uid" JSON field, and the
+  		 	  "label" vocabulary field to the "title" JSON field:
+  		 			<mapping>
+  		 				<map field="id">uid</map>
+  		 				<map field="id">uid</map>
+  		 			</mapping>
+ 	-->
+  	<directory name="Akeneo_Product"
+      class="org.nuxeo.directory.connector.json.akeneo.AkeneoInMemoryConnector">
+
+      <idField>sku</idField>
+      <schema>vocabulary</schema>
+      <parameters>
+        <parameter name="url">http://mchp206a.global-intra.net/api/products.json?attributes=1&amp;object_type=product</parameter>
+        <parameter name="proxyHost">172.28.12.5</parameter>
+        <parameter name="proxyPort">80</parameter>
+      </parameters>
+      <mapping>
+       <map field="label">product_name</map>
+       <map field="id">sku</map>
+      </mapping>
+    </directory>
+    
+  </extension>
+</component>
